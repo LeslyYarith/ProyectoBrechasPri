@@ -5,12 +5,13 @@ import { HttpEvent, HttpEventType } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router'; // <-- agregado
+import { Router } from '@angular/router';
+import { MapaComponent } from "../../components/mapa/mapa"; // <-- agregado
 
 @Component({
   selector: 'app-upload-csv',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MapaComponent],
   templateUrl: './upload-csv-component.html',
   styleUrls: ['./upload-csv-component.css']
 })
@@ -35,8 +36,8 @@ export class UploadCsvComponent implements OnInit {
   ngOnInit(): void {
     this.apiService.connectionStatus$.subscribe(status => {
       this.isConnected = status;
-      this.connectionMessage = status 
-        ? 'Conexión establecida correctamente con la API' 
+      this.connectionMessage = status
+        ? 'Conexión establecida correctamente con la API'
         : 'No se pudo conectar a la API';
     });
   }

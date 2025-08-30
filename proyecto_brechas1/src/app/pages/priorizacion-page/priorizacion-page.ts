@@ -3,7 +3,9 @@ import { PriorityTabComponent } from "../../components/priority-table/priority-t
 
 @Component({
   selector: 'app-priorizacion-page',
+
   imports: [PriorityTabComponent],
+  standalone: true,
   templateUrl: './priorizacion-page.html',
   styleUrl: './priorizacion-page.css'
 })

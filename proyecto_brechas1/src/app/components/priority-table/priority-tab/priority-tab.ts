@@ -9,6 +9,7 @@ import { PrioritizationService, PriorityRegion } from '../../../services/priorit
   selector: 'app-priority-tab',
   imports: [CommonModule,
     FormsModule],
+    standalone: true,
   templateUrl: './priority-tab.html',
   styleUrl: './priority-tab.css'
 })
