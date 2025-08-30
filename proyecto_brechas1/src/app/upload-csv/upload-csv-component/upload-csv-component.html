@@ -1,0 +1,64 @@
+<div class="container">
+  <h1>Gestión de Datos</h1>
+
+  <!-- Pestañas -->
+  <div class="tabs">
+    <button [class.active]="activeTab === 'upload'" (click)="setActiveTab('upload')">
+      Subir CSV
+    </button>
+    <button [class.active]="activeTab === 'api'" (click)="setActiveTab('api')">
+      Conectar API
+    </button>
+  </div>
+
+<!-- Botón de navegación a Prioridad -->
+<div class="navigation-buttons" style="margin: 20px 0;">
+  <button 
+    (click)="goToPriorizacion()" 
+    style="padding: 10px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+    Ir a Prioridad
+  </button>
+</div>
+
+
+  <!-- Contenido pestaña: Subir CSV -->
+  <div *ngIf="activeTab === 'upload'" class="tab-content">
+    <h2>Subir Archivo CSV</h2>
+    <input type="file" (change)="onFileSelected($event)" accept=".csv" />
+    <button (click)="onUpload()" [disabled]="!selectedFile || progress > 0">
+      Subir CSV
+    </button>
+
+
+    <!-- Barra de progreso -->
+    <div *ngIf="progress > 0 && progress < 100" class="progress-bar">
+      <div [style.width.%]="progress">{{ progress }}%</div>
+    </div>
+  </div>
+
+  <!-- Contenido pestaña: Conectar API -->
+  <div *ngIf="activeTab === 'api'" class="tab-content">
+    <h2>Conexión a la API del World Bank</h2>
+    <p>{{ connectionMessage }}</p>
+    <button (click)="checkAPIConnection()" [disabled]="isLoading">
+      {{ isLoading ? 'Conectando...' : 'Probar Conexión API' }}
+    </button>
+
+    <div *ngIf="isConnected">
+      <h3>Obtener Indicadores</h3>
+      <label for="topicId">ID del Tema (ej. 1, 2, 3, etc.):</label>
+      <input id="topicId" type="text" [(ngModel)]="selectedTopicId" placeholder="Ej: 1" />
+      <button (click)="fetchAPIData()" [disabled]="isLoading">
+        {{ isLoading ? 'Cargando Datos...' : 'Obtener Datos API' }}
+      </button>
+
+      <!-- Datos obtenidos -->
+      <div *ngIf="apiData.length > 0">
+        <h3>Datos Obtenidos</h3>
+        <div class="chart-container">
+          <canvas id="apiDataChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

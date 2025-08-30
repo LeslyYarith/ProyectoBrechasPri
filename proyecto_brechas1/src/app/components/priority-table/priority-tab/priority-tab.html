@@ -1,0 +1,92 @@
+<div class="prioritization-container">
+  <h2>Motor de Priorización de Inversión en Inclusión Digital</h2>
+
+  <div class="filters">
+    <!-- Indicador -->
+    <div class="filter-group">
+      <label for="indicator">Indicador:</label>
+      <select id="indicator" [(ngModel)]="selectedIndicator" (ngModelChange)="loadPriorityRegions()">
+        <option *ngFor="let indicator of availableIndicators" [value]="indicator">
+          {{ indicator }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Año inicial -->
+    <div class="filter-group">
+      <label for="minYear">Año inicial:</label>
+      <input type="number" id="minYear"
+             [(ngModel)]="minYear"
+             (ngModelChange)="loadPriorityRegions()"
+             min="2000" max="2025">
+    </div>
+
+    <!-- Año final -->
+    <div class="filter-group">
+      <label for="maxYear">Año final:</label>
+      <input type="number" id="maxYear"
+             [(ngModel)]="maxYear"
+             (ngModelChange)="loadPriorityRegions()"
+             min="2000" max="2025">
+    </div>
+
+    <!-- Botones -->
+    <button (click)="loadPriorityRegions()" [disabled]="isLoading || !selectedIndicator">
+      {{ isLoading ? 'Cargando...' : 'Actualizar' }}
+    </button>
+
+    <!--
+    <button (click)="exportToCSV()" [disabled]="priorityRegions.length === 0" class="export-btn">
+      Exportar a CSV
+    </button>
+    -->
+  </div>
+
+  <!-- Mensajes -->
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="isLoading" class="loading">
+    <p>Cargando datos de priorización...</p>
+  </div>
+
+  <div *ngIf="!isLoading && priorityRegions.length === 0" class="no-data">
+    <p>No se encontraron datos para los criterios seleccionados.</p>
+  </div>
+
+  <!-- Resultados -->
+  <div *ngIf="!isLoading && priorityRegions.length > 0" class="results">
+    <h3>Regiones Prioritarias para Inversión - {{ selectedIndicator }}</h3>
+    <p>Ordenadas por mayor necesidad de intervención (score de 0 a 1)</p>
+
+    <table class="priority-table">
+      <thead>
+        <tr>
+          <th>Prioridad</th>
+          <th>País</th>
+          <th>Valor Actual</th>
+          <th>Tasa de Crecimiento</th>
+          <th>Score de Prioridad</th>
+          <th>Año más reciente</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let region of priorityRegions; let i = index"
+            [class]="getPriorityClass(region.priorityScore)">
+          <td>{{ i + 1 }}</td>
+          <td>{{ region.countryName }} ({{ region.countryCode }})</td>
+          <td>{{ region.currentValue | number:'1.2-2' }}</td>
+          <td>{{ region.growthRate | number:'1.2-2' }}%</td>
+          <td>
+            <div class="score-bar">
+              <div class="score-fill" [style.width.%]="region.priorityScore * 100"></div>
+              <span>{{ region.priorityScore | number:'1.2-2' }}</span>
+            </div>
+          </td>
+          <td>{{ region.latestYear }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
