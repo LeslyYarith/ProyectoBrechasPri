@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
 })
 export class DataService {
    private baseUrl = 'http://localhost:8080/api/import';
+   
   
 
   constructor(private http: HttpClient) {}
@@ -23,5 +24,10 @@ export class DataService {
 
     return this.http.request(req);
   }
+  // ✅ Nuevo método para obtener los datos para la gráfica
+  getObservations(): Observable<any[]> {
+    return this.http.get<any[]>('http://localhost:8080/api/observations/all');
+  }
+
 
 }

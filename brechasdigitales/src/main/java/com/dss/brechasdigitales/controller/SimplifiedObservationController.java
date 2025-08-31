@@ -40,4 +40,8 @@ public class SimplifiedObservationController {
     public List<SimplifiedObservation> getByYear(@PathVariable Integer timePeriod) {
         return repository.findByTimePeriod(timePeriod);
     }
+     @GetMapping("/all")
+    public List<SimplifiedObservation> getAllObservations() {
+        return repository.findAll();
+    }
 }

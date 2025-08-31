@@ -1,50 +1,78 @@
-import { Component, OnInit } from '@angular/core';
+// upload-csv-component.ts
+import { Component, OnInit, Inject, PLATFORM_ID, ViewChild } from '@angular/core';
+import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { DataService } from '../../services/data-service';
 import { ApiService } from '../../services/api.service';
-import { HttpEvent, HttpEventType } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpEvent, HttpEventType, HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MapaComponent } from "../../components/mapa/mapa"; // <-- agregado
+import { MapaComponent } from "../../components/mapa/mapa"; 
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartConfiguration, Chart, registerables } from 'chart.js';
+
+Chart.register(...registerables);
 
 @Component({
   selector: 'app-upload-csv',
   standalone: true,
-  imports: [CommonModule, FormsModule, MapaComponent],
+  imports: [CommonModule, FormsModule, MapaComponent, BaseChartDirective],
   templateUrl: './upload-csv-component.html',
   styleUrls: ['./upload-csv-component.css']
 })
 export class UploadCsvComponent implements OnInit {
   selectedFile: File | null = null;
   progress = 0;
-  isConnected: boolean = false;
-  connectionMessage: string = '';
+  isConnected = false;
+  connectionMessage = '';
   apiData: any[] = [];
-  isLoading: boolean = false;
+  isLoading = false;
   activeTab: string = 'upload';
+  selectedTopicId: string = '1';
+  isBrowser = false;
 
-  // Agrega una variable para el topicId (ejemplo)
-  selectedTopicId: string = '1'; // Puedes poner un ID de tema por defecto o hacerlo seleccionable
+  @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
+
+  lineChartData: ChartConfiguration<'line'>['data'] = {
+    labels: ["Sin datos aún"],
+    datasets: [
+      {
+        data: [0],
+        label: 'Valores CSV/DB',
+        fill: false,
+        borderColor: 'blue',
+        backgroundColor: 'rgba(30,136,229,0.2)',
+        tension: 0.4
+      }
+    ]
+  };
+
+  lineChartOptions: ChartConfiguration<'line'>['options'] = {
+    responsive: true,
+    plugins: { legend: { display: true } }
+  };
 
   constructor(
     private dataService: DataService,
     private apiService: ApiService,
-    private router: Router // <-- inyectado correctamente
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit(): void {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+
     this.apiService.connectionStatus$.subscribe(status => {
       this.isConnected = status;
       this.connectionMessage = status
         ? 'Conexión establecida correctamente con la API'
         : 'No se pudo conectar a la API';
     });
+
+    // ⚡ Cargar datos de DB al iniciar
+    this.loadChartDataFromDB();
   }
 
-  goToPriorizacion() {
-    this.router.navigate(['/priorizacion']); // <-- ahora funciona
-  }
+  goToPriorizacion() { this.router.navigate(['/priorizacion']); }
 
   onFileSelected(event: Event) {
     const element = event.target as HTMLInputElement;
@@ -63,11 +91,17 @@ export class UploadCsvComponent implements OnInit {
       next: (event: HttpEvent<any>) => {
         if (event.type === HttpEventType.UploadProgress && event.total) {
           this.progress = Math.round((100 * event.loaded) / event.total);
-          console.log(`Progreso: ${this.progress}%`);
         } else if (event.type === HttpEventType.Response) {
-          console.log("✅ Respuesta del backend:", event.body);
-          alert("Archivo subido correctamente.\n" + (event.body as string[]).join("\n"));
+          const rows = typeof event.body === 'string'
+            ? event.body.split('\n')
+            : (event.body as string[]);
+
+          this.procesarCsv(rows); // ⚡ actualiza gráfica
+          alert("Archivo subido correctamente.");
           this.progress = 0;
+
+          // 🔄 también recargar desde DB
+          this.loadChartDataFromDB();
         }
       },
       error: (err: HttpErrorResponse) => {
@@ -84,12 +118,12 @@ export class UploadCsvComponent implements OnInit {
       next: () => {
         this.isLoading = false;
         this.activeTab = 'api';
-        alert('Conexión con la API de World Bank (a través del backend) exitosa.');
+        alert('Conexión con la API exitosa.');
       },
       error: (err: any) => {
         this.isLoading = false;
         console.error('Error conectando a API:', err);
-        alert('Error al conectar con la API de World Bank.');
+        alert('Error al conectar con la API.');
       }
     });
   }
@@ -99,10 +133,9 @@ export class UploadCsvComponent implements OnInit {
       alert('Primero debe establecer conexión con la API');
       return;
     }
-
     if (!this.selectedTopicId) {
-        alert('Por favor, selecciona un ID de tema.');
-        return;
+      alert('Por favor, selecciona un ID de tema.');
+      return;
     }
 
     this.isLoading = true;
@@ -119,8 +152,79 @@ export class UploadCsvComponent implements OnInit {
     });
   }
 
-  // Cambiar entre pestañas
-  setActiveTab(tab: string): void {
-    this.activeTab = tab;
+  setActiveTab(tab: string): void { this.activeTab = tab; }
+
+  private procesarCsv(rows: string[]): void {
+    const labels: string[] = [];
+    const values: number[] = [];
+
+    rows.forEach((row, i) => {
+      if (!row.trim()) return;
+      const cols = row.split(',');
+      if (i === 0) return; // encabezado
+
+      labels.push(cols[0]);
+      values.push(Number(cols[1]) || 0);
+    });
+
+    this.lineChartData = {
+      labels,
+      datasets: [
+        {
+          ...this.lineChartData.datasets[0],
+          data: values
+        }
+      ]
+    };
+
+    this.chart?.update();
+  }
+
+  // ✅ Cargar la gráfica desde DB con múltiples series
+  private loadChartDataFromDB(): void {
+    this.dataService.getObservations().subscribe({
+      next: (data) => {
+        if (!data || data.length === 0) return;
+
+        // 1️⃣ Todos los años únicos (eje X)
+        const years = Array.from(new Set(data.map(d => d.timePeriod))).sort();
+
+        // 2️⃣ Agrupar por indicador
+        const indicatorsMap = new Map<string, number[]>();
+        data.forEach(d => {
+          if (!indicatorsMap.has(d.indicatorName)) {
+            indicatorsMap.set(d.indicatorName, Array(years.length).fill(0));
+          }
+          const index = years.indexOf(d.timePeriod);
+          indicatorsMap.get(d.indicatorName)![index] = d.obsValue;
+        });
+
+        // 3️⃣ Construir datasets
+        const datasets = Array.from(indicatorsMap.entries()).map(([name, values], i) => ({
+          label: name,
+          data: values,
+          fill: false,
+          borderColor: this.getColor(i),
+          tension: 0.4
+        }));
+
+        this.lineChartData = {
+          labels: years,
+          datasets
+        };
+
+        this.chart?.update();
+      },
+      error: (err) => console.error('Error cargando datos de DB:', err)
+    });
+  }
+
+  // 🔹 Generar colores distintos para cada serie
+  private getColor(index: number): string {
+    const colors = [
+      '#3e95cd', '#8e5ea2', '#3cba9f', '#e8c3b9', '#c45850', 
+      '#ff6384', '#36a2eb', '#cc65fe', '#ffce56'
+    ];
+    return colors[index % colors.length];
   }
 }

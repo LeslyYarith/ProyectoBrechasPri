@@ -11,17 +11,16 @@
     </button>
   </div>
 
-<!-- Botón de navegación a Prioridad -->
-<div class="navigation-buttons" style="margin: 20px 0;">
-  <button
-    (click)="goToPriorizacion()"
-    style="padding: 10px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
-    Ir a Prioridad
-  </button>
-</div>
+  <!-- Botón de navegación -->
+  <div class="navigation-buttons" style="margin: 20px 0;">
+    <button
+      (click)="goToPriorizacion()"
+      style="padding: 10px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+      Ir a Prioridad
+    </button>
+  </div>
 
-
-  <!-- Contenido pestaña: Subir CSV -->
+  <!-- 📂 Pestaña: Subir CSV -->
   <div *ngIf="activeTab === 'upload'" class="tab-content">
     <h2>Subir Archivo CSV</h2>
     <input type="file" (change)="onFileSelected($event)" accept=".csv" />
@@ -29,22 +28,27 @@
       Subir CSV
     </button>
 
-
     <!-- Barra de progreso -->
     <div *ngIf="progress > 0 && progress < 100" class="progress-bar">
       <div [style.width.%]="progress">{{ progress }}%</div>
     </div>
+
+    <!-- 📊 Gráfica (render solo en navegador) -->
+    <div class="chart-container" style="margin-top: 20px; height: 400px;">
+      <div *ngIf="isBrowser">
+        <canvas
+          baseChart
+          [data]="lineChartData"
+          [options]="lineChartOptions"
+          [type]="'line'">
+        </canvas>
+      </div>
+    </div>
   </div>
 
-  <!-- Contenido pestaña: Conectar API -->
+  <!-- 🌐 Pestaña: API -->
   <div *ngIf="activeTab === 'api'" class="tab-content">
-    <h2>Conexión a la API del World Bank</h2>
-    <p>{{ connectionMessage }}</p>
-    <button (click)="checkAPIConnection()" [disabled]="isLoading">
-      {{ isLoading ? 'Conectando...' : 'Probar Conexión API' }}
-    </button>
-
-    <div *ngIf="isConnected">
+    <div *ngIf="isConnected; else notConnected">
       <h3>Obtener Indicadores</h3>
       <label for="topicId">ID del Tema (ej. 1, 2, 3, etc.):</label>
       <input id="topicId" type="text" [(ngModel)]="selectedTopicId" placeholder="Ej: 1" />
@@ -53,13 +57,20 @@
       </button>
 
       <!-- Datos obtenidos -->
-      <div *ngIf="apiData.length > 0">
+      <div *ngIf="apiData.length > 0" style="margin-top: 20px;">
         <h3>Datos Obtenidos</h3>
-        <div class="chart-container">
-          <canvas id="apiDataChart"></canvas>
-        </div>
+        <pre>{{ apiData | json }}</pre>
       </div>
     </div>
+
+    <ng-template #notConnected>
+      <p>No hay conexión con la API.</p>
+      <button (click)="checkAPIConnection()" [disabled]="isLoading">
+        {{ isLoading ? 'Conectando...' : 'Probar Conexión API' }}
+      </button>
+    </ng-template>
   </div>
 </div>
+
+<!-- 🌍 Mapa -->
 <app-mapa></app-mapa>
