@@ -15,7 +15,7 @@ import { Observation, ObservationService } from '../../services/observation';
 @Component({
   selector: 'app-mapa',
   standalone: true,
-  imports: [], // 👈 Quitamos HttpClientModule (usa provideHttpClient en main.ts)
+  imports: [],
   template: `
     <div class="map-container">
       <!-- 🔍 Buscador -->
@@ -50,13 +50,10 @@ export class MapaComponent implements OnInit, AfterViewInit {
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
-  ngOnInit(): void {
-    // Aquí puedes cargar datos si quieres, pero NO iniciar ECharts todavía
-  }
+  ngOnInit(): void {}
 
   ngAfterViewInit(): void {
     if (isPlatformBrowser(this.platformId)) {
-      // 👇 Esperar al render del DOM para asegurar ancho/alto
       setTimeout(() => this.inicializarMapa(), 0);
     }
   }
@@ -64,11 +61,38 @@ export class MapaComponent implements OnInit, AfterViewInit {
   private inicializarMapa() {
     this.chart = echarts.init(this.chartElement.nativeElement);
 
-    // 1. Cargar mapa base (world.json debe estar en src/assets/world.json)
+    // 👀 Loader mientras carga
+    this.chart.showLoading('default', {
+      text: 'Cargando mapa...',
+      color: '#005f73',
+    });
+
+    // 1. Cargar mapa base (puedes usar world-low.json para más velocidad)
     this.http.get('assets/world.json').subscribe((worldMap: any) => {
       echarts.registerMap('world', worldMap);
 
-      // 2. Obtener datos del backend
+      // 2. Mostrar el mapa vacío al instante
+      this.chart.setOption({
+        tooltip: { trigger: 'item' },
+        geo: {
+          map: 'world',
+          roam: true,
+          zoom: 1.2,
+          scaleLimit: { min: 1, max: 10 },
+          emphasis: { label: { show: false } },
+        },
+        series: [
+          {
+            name: 'Mapa',
+            type: 'map',
+            geoIndex: 0,
+            roam: true,
+            data: [], // 👈 vacío al inicio
+          },
+        ],
+      });
+
+      // 3. Obtener datos del backend
       this.observationService.getAll().subscribe((observations: Observation[]) => {
         const grouped: { [key: string]: Observation } = {};
         observations.forEach((obs) => {
@@ -80,7 +104,7 @@ export class MapaComponent implements OnInit, AfterViewInit {
           }
         });
 
-        // ✅ Datos para el mapa
+        // ✅ Preparar datos
         this.chartData = Object.values(grouped).map((obs) => ({
           name: obs.countryName,
           value: obs.obsValue,
@@ -94,7 +118,8 @@ export class MapaComponent implements OnInit, AfterViewInit {
 
         console.log('✅ Datos cargados:', this.chartData);
 
-        const option = {
+        // 4. Actualizar mapa con datos
+        this.chart.setOption({
           tooltip: {
             trigger: 'item',
             formatter: (params: any) => {
@@ -117,25 +142,19 @@ export class MapaComponent implements OnInit, AfterViewInit {
             inRange: { color: ['#d4f1f9', '#005f73'] },
             calculable: true,
           },
-          geo: {
-            map: 'world',
-            roam: true,
-            scaleLimit: { min: 1, max: 10 },
-            emphasis: { label: { show: false } },
-          },
           series: [
             {
               name: 'Mapa',
               type: 'map',
               geoIndex: 0,
               roam: true,
-              data: this.chartData,
+              data: this.chartData, // 👈 ahora con datos
             },
           ],
-        };
+        });
 
-        this.chart.setOption(option);
-        this.chart.resize(); // 👈 fuerza render por si el div estaba colapsado
+        this.chart.hideLoading(); // 👈 quitamos el loader
+        this.chart.resize();
       });
     });
   }
@@ -149,14 +168,8 @@ export class MapaComponent implements OnInit, AfterViewInit {
       (d) => d.name.toLowerCase() === nombre.toLowerCase()
     );
     if (pais) {
-      this.chart.dispatchAction({
-        type: 'highlight',
-        name: pais.name,
-      });
-      this.chart.dispatchAction({
-        type: 'showTip',
-        name: pais.name,
-      });
+      this.chart.dispatchAction({ type: 'highlight', name: pais.name });
+      this.chart.dispatchAction({ type: 'showTip', name: pais.name });
     } else {
       alert('País no encontrado');
     }
