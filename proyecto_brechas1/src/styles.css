@@ -1,1 +1,186 @@
-/* You can add global styles to this file, and also import other style files */
+/* ===========================
+   🎨 Variables de color
+=========================== */
+:root {
+  --background-color: #ffffff;
+  --text-color: #000000;
+
+  /* Paleta de colores */
+  --color1: #e0e0e0; /* gris suave */
+  --color2: #007bff; /* azul principal */
+  --color3: #3399ff; /* azul claro */
+  --color4: #ff4d4d; /* rojo */
+  --color5: #28a745; /* verde */
+}
+
+.dark-theme {
+  --background-color: #121212;
+  --text-color: #ffffff;
+
+  --color1: #444444;
+  --color2: #3399ff;
+  --color3: #66b3ff;
+  --color4: #ff6666;
+  --color5: #5cd65c;
+}
+
+/* ===========================
+   🌍 Estilos globales
+=========================== */
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+h1, h2, h3, p, a, label, pre {
+  color: var(--text-color);
+  transition: color 0.3s;
+}
+
+/* ===========================
+   🟦 Navegación
+=========================== */
+nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+}
+
+nav a {
+  text-decoration: none;
+  color: var(--text-color);
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+nav a:hover {
+  background-color: var(--color2);
+  color: #fff;
+}
+
+.navigation-buttons button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: var(--color2);
+  color: var(--text-color);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.navigation-buttons button:hover {
+  background-color: var(--color3);
+}
+
+/* ===========================
+   🟨 Tabs (pestañas)
+=========================== */
+.tabs {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.tabs button {
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-right: 5px;
+  color: var(--text-color);
+  transition: color 0.3s, border-bottom-color 0.3s;
+}
+
+.tabs button.active {
+  border-bottom-color: var(--color2);
+  color: var(--color2);
+  font-weight: bold;
+}
+
+/* ===========================
+   📝 Formularios
+=========================== */
+input, select, textarea {
+  color: var(--text-color);
+  background-color: var(--background-color);
+  border: 1px solid var(--color1);
+  padding: 5px;
+  border-radius: 4px;
+  transition: background-color 0.3s, color 0.3s, border 0.3s;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--text-color);
+}
+
+/* ===========================
+   📊 Barra de progreso
+=========================== */
+.progress-bar {
+  width: 100%;
+  height: 20px;
+  background-color: var(--color1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  width: 0;
+  background-color: var(--color2);
+  transition: width 0.3s ease;
+}
+
+/* ===========================
+   🟥 Botones de acción
+=========================== */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.action-buttons button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.action-buttons .delete {
+  background-color: var(--color4);
+  color: #fff;
+}
+
+.action-buttons .delete:hover {
+  background-color: #ff3333;
+}
+
+.action-buttons .edit {
+  background-color: var(--color2);
+  color: #fff;
+}
+
+.action-buttons .edit:hover {
+  background-color: var(--color3);
+}
+
+.action-buttons .add {
+  background-color: var(--color5);
+  color: #fff;
+}
+
+.action-buttons .add:hover {
+  background-color: #4cd137;
+}

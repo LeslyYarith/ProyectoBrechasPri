@@ -16,27 +16,7 @@ import { Observation, ObservationService } from '../../services/observation';
   selector: 'app-mapa',
   standalone: true,
   imports: [],
-  template: `
-    <div class="map-container">
-      <!-- 🔍 Buscador -->
-      <input
-        type="text"
-        placeholder="Buscar país..."
-        (keyup.enter)="buscarPais($event)"
-        class="buscador"
-      />
-
-      <!-- 📝 Explicación -->
-      <div class="info-box">
-        🌍 Cada país está coloreado según su valor de observación.<br />
-        🔍 Usa la barra de búsqueda para encontrar un país y acercar la vista.<br />
-        🖱️ También puedes hacer <b>zoom</b> y mover el mapa con el ratón.
-      </div>
-
-      <!-- 📌 Contenedor del mapa -->
-      <div #chart style="width: 100%; height: 600px;"></div>
-    </div>
-  `,
+  templateUrl: './mapa.html',
   styleUrls: ['./mapa.css'],
 })
 export class MapaComponent implements OnInit, AfterViewInit {
@@ -67,7 +47,7 @@ export class MapaComponent implements OnInit, AfterViewInit {
       color: '#005f73',
     });
 
-    // 1. Cargar mapa base (puedes usar world-low.json para más velocidad)
+    // 1. Cargar mapa base
     this.http.get('assets/world.json').subscribe((worldMap: any) => {
       echarts.registerMap('world', worldMap);
 
@@ -87,7 +67,7 @@ export class MapaComponent implements OnInit, AfterViewInit {
             type: 'map',
             geoIndex: 0,
             roam: true,
-            data: [], // 👈 vacío al inicio
+            data: [],
           },
         ],
       });
@@ -148,12 +128,12 @@ export class MapaComponent implements OnInit, AfterViewInit {
               type: 'map',
               geoIndex: 0,
               roam: true,
-              data: this.chartData, // 👈 ahora con datos
+              data: this.chartData,
             },
           ],
         });
 
-        this.chart.hideLoading(); // 👈 quitamos el loader
+        this.chart.hideLoading();
         this.chart.resize();
       });
     });
