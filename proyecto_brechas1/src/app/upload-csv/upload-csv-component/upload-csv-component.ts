@@ -6,7 +6,7 @@ import { ApiService } from '../../services/api.service';
 import { HttpEvent, HttpEventType, HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MapaComponent } from "../../components/mapa/mapa"; 
+import { MapaComponent } from "../../components/mapa/mapa";
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, Chart, registerables } from 'chart.js';
 
@@ -222,7 +222,7 @@ export class UploadCsvComponent implements OnInit {
   // 🔹 Generar colores distintos para cada serie
   private getColor(index: number): string {
     const colors = [
-      '#3e95cd', '#8e5ea2', '#3cba9f', '#e8c3b9', '#c45850', 
+      '#3e95cd', '#8e5ea2', '#3cba9f', '#e8c3b9', '#c45850',
       '#ff6384', '#36a2eb', '#cc65fe', '#ffce56'
     ];
     return colors[index % colors.length];

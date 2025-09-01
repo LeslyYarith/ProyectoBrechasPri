@@ -1,6 +1,7 @@
 package com.dss.brechasdigitales.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 @RestController
 @RequestMapping("/api/proxy/worldbank")
+@CrossOrigin(origins = "http://localhost:4200") // permite Angular
 public class WorldBankController {
 
     private final RestTemplate restTemplate = new RestTemplate();

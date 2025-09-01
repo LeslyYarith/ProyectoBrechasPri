@@ -7,7 +7,7 @@ import { catchError, tap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = '/api/proxy/worldbank';
+  private apiUrl = 'http://localhost:8080/api/proxy/worldbank';
   private connectionStatus = new BehaviorSubject<boolean>(false);
   public connectionStatus$ = this.connectionStatus.asObservable();
 
@@ -15,10 +15,12 @@ export class ApiService {
 
   // ================== CONEXIÓN ==================
   testConnection(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/topics`).pipe( // Cambiado a /topics para una prueba más robusta
-      tap(() => {
+    // Cambiado a responseType: 'text' para evitar fallo de parseo
+    return this.http.get(`${this.apiUrl}/test`, { responseType: 'text' }).pipe(
+      tap((res: string) => {
         this.connectionStatus.next(true);
         console.log('✅ Conexión a API establecida correctamente (vía backend)');
+        console.log('Respuesta recibida:', res); // ver qué devuelve realmente
       }),
       catchError((error: HttpErrorResponse) => {
         this.connectionStatus.next(false);

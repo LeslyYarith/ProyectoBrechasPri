@@ -8,9 +8,6 @@ import { Observable } from 'rxjs';
 })
 export class DataService {
    private baseUrl = 'http://localhost:8080/api/import';
-   
-  
-
   constructor(private http: HttpClient) {}
 
   uploadCsv(file: File): Observable<HttpEvent<any>> {
