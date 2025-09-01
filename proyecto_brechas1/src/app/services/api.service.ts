@@ -30,14 +30,30 @@ export class ApiService {
     );
   }
 
-  // ================== INDICADORES ==================
-  getIndicators(topicId: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/topics/${topicId}/indicators`).pipe(
-      catchError((error: HttpErrorResponse) => {
-        console.error('❌ Error obteniendo indicadores:', error.message);
-        return throwError(() => new Error('Error obteniendo indicadores de la API'));
-      })
-    );
-  }
+  // ================== SEARCH ==================
+searchIndicators(query: string): Observable<any> {
+  const body = {
+    count: true,
+    select: "series_description/idno, series_description/name, series_description/database_id",
+    search: query,
+    top: 10
+  };
 
+  return this.http.post(`${this.apiUrl}/search`, body).pipe(
+    catchError((error: HttpErrorResponse) => {
+      console.error('❌ Error en búsqueda:', error.message);
+      return throwError(() => new Error('Error al buscar en la API'));
+    })
+  );
+}
+
+// ================== EJEMPLO: Población Colombia ==================
+getColombiaPopulation(): Observable<any> {
+  return this.http.get(`${this.apiUrl}/population/colombia`).pipe(
+    catchError((error: HttpErrorResponse) => {
+      console.error('❌ Error obteniendo población de Colombia:', error.message);
+      return throwError(() => new Error('Error obteniendo datos de población'));
+    })
+  );
+}
 }

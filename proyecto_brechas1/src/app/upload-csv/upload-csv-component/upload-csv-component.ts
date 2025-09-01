@@ -24,7 +24,13 @@ export class UploadCsvComponent implements OnInit {
   progress = 0;
   isConnected = false;
   connectionMessage = '';
+
+  // 🔹 ahora apiData será solo el array "value" de la respuesta
   apiData: any[] = [];
+  colombiaPopulation: any[] = [];
+  // 🔹 guardamos el total de resultados que devuelve "@odata.count"
+  totalResultados = 0;
+
   isLoading = false;
   activeTab: string = 'upload';
   selectedTopicId: string = '1';
@@ -133,15 +139,16 @@ export class UploadCsvComponent implements OnInit {
       alert('Primero debe establecer conexión con la API');
       return;
     }
-    if (!this.selectedTopicId) {
-      alert('Por favor, selecciona un ID de tema.');
-      return;
-    }
 
     this.isLoading = true;
-    this.apiService.getIndicators(this.selectedTopicId).subscribe({
-      next: (data: any[]) => {
-        this.apiData = data;
+
+    // 🔎 ejemplo: buscar "poverty"
+    this.apiService.searchIndicators("poverty").subscribe({
+      next: (data: any) => {
+        // ✅ Ajuste: la API devuelve un objeto con @odata.count y value[]
+        this.apiData = data.value || [];            // guardamos solo el array
+        this.totalResultados = data['@odata.count'] || this.apiData.length; // guardamos el total
+        console.log("✅ Datos recibidos de la API:", data);
         this.isLoading = false;
       },
       error: (err: any) => {
@@ -151,6 +158,35 @@ export class UploadCsvComponent implements OnInit {
       }
     });
   }
+
+fetchColombiaPopulation(): void {
+  this.isLoading = true;
+  this.apiService.getColombiaPopulation().subscribe({
+    next: (data: any) => {
+      console.log("📊 Datos crudos de población Colombia:", data);
+
+      // Normalizar dependiendo del formato que llegue
+      if (data.data && Array.isArray(data.data)) {
+        this.colombiaPopulation = data.data;
+      } else if (data.value && Array.isArray(data.value)) {
+        this.colombiaPopulation = data.value;
+      } else if (Array.isArray(data)) {
+        this.colombiaPopulation = data;
+      } else {
+        this.colombiaPopulation = [];
+      }
+
+      console.log("📊 Normalizado:", this.colombiaPopulation);
+      this.isLoading = false;
+    },
+    error: (err: any) => {
+      console.error('❌ Error obteniendo datos de población de Colombia:', err);
+      alert('Error al obtener población de Colombia');
+      this.isLoading = false;
+    }
+  });
+}
+
 
   setActiveTab(tab: string): void { this.activeTab = tab; }
 

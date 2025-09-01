@@ -3,19 +3,17 @@
 
   <!-- Pestañas -->
   <div class="tabs">
-    <button [class.active]="activeTab === 'upload'" (click)="setActiveTab('upload')">
+    <button class="tab-btn" [class.active]="activeTab === 'upload'" (click)="setActiveTab('upload')">
       Subir CSV
     </button>
-    <button [class.active]="activeTab === 'api'" (click)="setActiveTab('api')">
+    <button class="tab-btn" [class.active]="activeTab === 'api'" (click)="setActiveTab('api')">
       Conectar API
     </button>
   </div>
 
   <!-- Botón de navegación -->
-  <div class="navigation-buttons" style="margin: 20px 0;">
-    <button
-      (click)="goToPriorizacion()"
-      style="padding: 10px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+  <div class="navigation-buttons">
+    <button class="btn btn-primary" (click)="goToPriorizacion()">
       Ir a Prioridad
     </button>
   </div>
@@ -24,7 +22,7 @@
   <div *ngIf="activeTab === 'upload'" class="tab-content">
     <h2>Subir Archivo CSV</h2>
     <input type="file" (change)="onFileSelected($event)" accept=".csv" />
-    <button (click)="onUpload()" [disabled]="!selectedFile || progress > 0">
+    <button class="btn btn-success" (click)="onUpload()" [disabled]="!selectedFile || progress > 0">
       Subir CSV
     </button>
 
@@ -33,7 +31,7 @@
       <div [style.width.%]="progress">{{ progress }}%</div>
     </div>
 
-    <!-- 📊 Gráfica (render solo en navegador) -->
+    <!-- 📊 Gráfica -->
     <div class="chart-container" style="margin-top: 20px; height: 400px;">
       <div *ngIf="isBrowser">
         <canvas
@@ -49,30 +47,64 @@
   <!-- 🌐 Pestaña: API -->
   <div *ngIf="activeTab === 'api'" class="tab-content">
     <div *ngIf="isConnected; else notConnected">
-      <h3>Obtener Indicadores</h3>
-      <label for="topicId">ID del Tema (ej. 1, 2, 3, etc.):</label>
-      <input id="topicId" type="text" [(ngModel)]="selectedTopicId" placeholder="Ej: 1" />
-      <button (click)="fetchAPIData()" [disabled]="isLoading">
-        {{ isLoading ? 'Cargando Datos...' : 'Obtener Datos API' }}
-      </button>
+      <!-- 📊 Datos de población de Colombia -->
+      <div style="margin-top: 30px;">
+        <h3>📊 Población de Colombia (2000–2020)</h3>
 
-      <!-- Datos obtenidos -->
-      <div *ngIf="apiData.length > 0" style="margin-top: 20px;">
-        <h3>Datos Obtenidos</h3>
-        <pre>{{ apiData | json }}</pre>
+        <table *ngIf="colombiaPopulation.length > 0" border="1" cellpadding="5" cellspacing="0" style="width:100%; border-collapse: collapse;">
+          <thead>
+            <tr>
+              <th>Año</th>
+              <th>Código País</th>
+              <th>Población</th>
+              <th>Unidad</th>
+              <th>Sexo</th>
+              <th>Edad</th>
+              <th>Área</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of colombiaPopulation">
+              <td>{{ item.TIME_PERIOD }}</td>
+              <td>{{ item.REF_AREA }}</td>
+              <td>{{ item.OBS_VALUE | number }}</td>
+              <td>{{ item.UNIT_MEASURE }}</td>
+              <td>{{ item.SEX || 'N/A' }}</td>
+              <td>{{ item.AGE || 'N/A' }}</td>
+              <td>{{ item.URBANISATION || 'N/A' }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div *ngIf="colombiaPopulation.length === 0">
+          No se encontraron datos de población para Colombia.
+        </div>
+
+        <!-- Botón para cargar -->
+        <br>
+        <button class="btn btn-info" (click)="fetchColombiaPopulation()">
+          Cargar datos de población
+        </button>
       </div>
     </div>
 
+    <!-- ❌ Bloque de error mejorado -->
     <ng-template #notConnected>
-      <p>No hay conexión con la API.</p>
-      <button (click)="checkAPIConnection()" [disabled]="isLoading">
+      <!-- Botón siempre visible para probar -->
+      <button class="btn btn-warning" (click)="checkAPIConnection()" [disabled]="isLoading">
         {{ isLoading ? 'Conectando...' : 'Probar Conexión API' }}
       </button>
+
+      <!-- Mensaje SOLO si ya intentó y no conectó -->
+      <p *ngIf="!isLoading && !isConnected" >
+        Por favor presione el boton, si continua viendo este mensaje,<br> la api no esta conectando
+
+      </p>
     </ng-template>
   </div>
+
   <div>
     <!-- 🌍 Mapa -->
-<app-mapa></app-mapa>
+    <app-mapa></app-mapa>
   </div>
 </div>
-
