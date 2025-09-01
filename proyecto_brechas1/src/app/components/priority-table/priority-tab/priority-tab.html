@@ -1,8 +1,28 @@
-<div class="prioritization-container">
+<div class="prioritization-container" [class.dark-mode]="isDarkMode">
   <h2>Motor de Priorización de Inversión en Inclusión Digital</h2>
 
+  <!-- Tarjetas KPI -->
+  <div class="kpi-cards">
+    <div class="kpi-card">
+      <h4>Indicadores Totales</h4>
+      <p>{{ availableIndicators.length }}</p>
+    </div>
+    <div class="kpi-card">
+      <h4>Regiones Evaluadas</h4>
+      <p>{{ priorityRegions.length }}</p>
+    </div>
+    <div class="kpi-card">
+      <h4>Año Seleccionado</h4>
+      <p>{{ maxYear }}</p>
+    </div>
+    <div class="kpi-card">
+      <h4>Última Actualización</h4>
+      <p>{{ today | date }}</p>
+    </div>
+  </div>
+
+  <!-- Filtros -->
   <div class="filters">
-    <!-- Indicador -->
     <div class="filter-group">
       <label for="indicator">Indicador:</label>
       <select id="indicator" [(ngModel)]="selectedIndicator" (ngModelChange)="loadPriorityRegions()">
@@ -12,45 +32,26 @@
       </select>
     </div>
 
-    <!-- Año inicial -->
     <div class="filter-group">
       <label for="minYear">Año inicial:</label>
-      <input type="number" id="minYear"
-             [(ngModel)]="minYear"
-             (ngModelChange)="loadPriorityRegions()"
-             min="2000" max="2025">
+      <input type="number" id="minYear" [(ngModel)]="minYear"
+             (ngModelChange)="loadPriorityRegions()" min="2000" max="2025">
     </div>
 
-    <!-- Año final -->
     <div class="filter-group">
       <label for="maxYear">Año final:</label>
-      <input type="number" id="maxYear"
-             [(ngModel)]="maxYear"
-             (ngModelChange)="loadPriorityRegions()"
-             min="2000" max="2025">
+      <input type="number" id="maxYear" [(ngModel)]="maxYear"
+             (ngModelChange)="loadPriorityRegions()" min="2000" max="2025">
     </div>
 
-    <!-- Botones -->
     <button (click)="loadPriorityRegions()" [disabled]="isLoading || !selectedIndicator">
       {{ isLoading ? 'Cargando...' : 'Actualizar' }}
     </button>
-
-    <!--
-    <button (click)="exportToCSV()" [disabled]="priorityRegions.length === 0" class="export-btn">
-      Exportar a CSV
-    </button>
-    -->
   </div>
 
   <!-- Mensajes -->
-  <div *ngIf="errorMessage" class="error-message">
-    {{ errorMessage }}
-  </div>
-
-  <div *ngIf="isLoading" class="loading">
-    <p>Cargando datos de priorización...</p>
-  </div>
-
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+  <div *ngIf="isLoading" class="loading"><p>Cargando datos de priorización...</p></div>
   <div *ngIf="!isLoading && priorityRegions.length === 0" class="no-data">
     <p>No se encontraron datos para los criterios seleccionados.</p>
   </div>
@@ -60,7 +61,7 @@
     <h3>Regiones Prioritarias para Inversión - {{ selectedIndicator }}</h3>
     <p>Ordenadas por mayor necesidad de intervención (score de 0 a 1)</p>
 
-    <table class="priority-table">
+    <table class="priority-table" [ngClass]="{'dark-table': isDarkMode, 'light-table': !isDarkMode}">
       <thead>
         <tr>
           <th>Prioridad</th>
@@ -88,5 +89,10 @@
         </tr>
       </tbody>
     </table>
-  </div>
+
+    <!-- Gráfico de ejemplo -->
+    <div style="margin-top:30px;">
+      <canvas id="priorityChart"></canvas>
+    </div>
+  </div>
 </div>

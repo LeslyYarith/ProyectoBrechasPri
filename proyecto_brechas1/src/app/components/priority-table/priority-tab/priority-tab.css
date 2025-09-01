@@ -1,0 +1,284 @@
+/* Fondo geométrico claro */
+body {
+  background: linear-gradient(135deg, #f2e0f6 25%, transparent 25%) -20px 0/40px 40px,
+              linear-gradient(225deg, #f2e0f6 25%, transparent 25%) -20px 0/40px 40px,
+              linear-gradient(315deg, #f2e0f6 25%, transparent 25%) 0px 0/40px 40px,
+              linear-gradient(45deg, #f2e0f6 25%, #ffffff 25%) 0px 0/40px 40px;
+  background-color: #ffffff;
+  transition: background 0.5s ease;
+}
+
+/* Fondo oscuro */
+body.dark-mode {
+  background: linear-gradient(135deg, #1c1c28 25%, transparent 25%) -20px 0/40px 40px,
+              linear-gradient(225deg, #1c1c28 25%, transparent 25%) -20px 0/40px 40px,
+              linear-gradient(315deg, #1c1c28 25%, transparent 25%) 0px 0/40px 40px,
+              linear-gradient(45deg, #1c1c28 25%, #2b2b40 25%) 0px 0/40px 40px;
+  background-color: #121212;
+}
+
+/* Contenedor principal */
+.prioritization-container {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: rgba(255, 255, 255, 0.92);
+  color: #140f07;
+  padding: 25px;
+  border-radius: 18px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  box-shadow: 0 8px 20px rgba(30, 42, 78, 0.25);
+  max-width: 1200px;
+  margin: 30px auto;
+  position: relative;
+  transition: all 0.4s ease;
+}
+
+body.dark-mode .prioritization-container {
+  background-color: rgba(28, 28, 40, 0.92);
+  color: #f4f4f9;
+}
+
+/* Bordes degradados */
+.prioritization-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 3px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #515daa, #9699fb, #f2e0f6);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+}
+
+.prioritization-container h2 {
+  text-align: center;
+  color: #1e2a4e;
+  margin-bottom: 25px;
+  font-size: 28px;
+  text-shadow: 1px 1px 4px rgba(30, 42, 78, 0.3);
+}
+
+body.dark-mode .prioritization-container h2 {
+  color: #c7c7ff;
+  text-shadow: 1px 1px 5px rgba(150, 153, 251, 0.4);
+}
+
+/* ===== Tarjetas KPI ===== */
+.kpi-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.kpi-card {
+  background: linear-gradient(135deg, #f2e0f6, #ffffff);
+  padding: 15px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(81, 93, 170, 0.25);
+  transition: transform 0.3s;
+}
+
+.kpi-card:hover {
+  transform: translateY(-5px);
+}
+
+.kpi-card h4 {
+  font-size: 16px;
+  color: #1e2a4e;
+}
+
+.kpi-card p {
+  font-size: 20px;
+  font-weight: bold;
+  color: #515daa;
+}
+
+body.dark-mode .kpi-card {
+  background: linear-gradient(135deg, #2b2b40, #1c1c28);
+  color: #f4f4f9;
+}
+
+/* Filtros */
+.filters {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter-group label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #515daa;
+}
+
+body.dark-mode .filter-group label {
+  color: #9699fb;
+}
+
+.filter-group input,
+.filter-group select {
+  padding: 10px 12px;
+  border: 1px solid #9699fb;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: #fff;
+  color: #140f07;
+  outline: none;
+  transition: 0.3s;
+}
+
+body.dark-mode .filter-group input,
+body.dark-mode .filter-group select {
+  background-color: #2b2b40;
+  color: #f4f4f9;
+  border: 1px solid #515daa;
+}
+
+/* Botones */
+button {
+  background-color: #515daa;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(81, 93, 170, 0.3);
+}
+
+button:hover {
+  background-color: #1e2a4e;
+  transform: scale(1.05);
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ===== Mensajes ===== */
+.error-message {
+  color: #e63946;
+  background: rgba(230, 57, 70, 0.1);
+  border-left: 4px solid #e63946;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.loading {
+  color: #515daa;
+  font-weight: bold;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.no-data {
+  color: #ff9f1c;
+  font-weight: bold;
+  text-align: center;
+  margin: 20px 0;
+}
+
+/* ===== Tabla ===== */
+.priority-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: transparent !important; /* Fondo transparente */
+  box-shadow: 0 3px 8px rgba(20, 15, 7, 0.15);
+  margin-top: 15px;
+}
+
+.priority-table thead {
+  background-color: rgba(30, 42, 78, 0.75); /* semitransparente */
+  color: white;
+}
+
+body.dark-mode .priority-table thead {
+  background-color: rgba(81, 93, 170, 0.75); /* semitransparente oscuro */
+}
+
+.priority-table th,
+.priority-table td {
+  text-align: center;
+  padding: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  color: #1e2a4e;
+  background-color: transparent !important; /* sin fondo */
+}
+
+body.dark-mode .priority-table td,
+body.dark-mode .priority-table th {
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  color: #f4f4f9;
+  background-color: transparent !important;
+}
+
+/* Filas pares */
+.priority-table tbody tr:nth-child(even) {
+  background-color: rgba(242, 224, 246, 0.08); /* muy tenue */
+}
+
+body.dark-mode .priority-table tbody tr:nth-child(even) {
+  background-color: rgba(81, 93, 170, 0.08);
+}
+
+/* Hover */
+.priority-table tbody tr:hover {
+  background-color: rgba(150, 153, 251, 0.15);
+  transition: 0.3s;
+}
+
+body.dark-mode .priority-table tbody tr:hover {
+  background-color: rgba(150, 153, 251, 0.2);
+}
+
+/* Score bar */
+.score-bar {
+  background: rgba(242, 224, 246, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  height: 18px;
+  width: 120px;
+  margin: 0 auto;
+}
+
+.score-fill {
+  background: linear-gradient(90deg, rgba(81,93,170,0.9), rgba(150,153,251,0.9));
+  height: 100%;
+  transition: width 0.6s ease-in-out;
+}
+
+.score-bar span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  font-weight: bold;
+  color: #140f07;
+}
+
+body.dark-mode .score-bar span {
+  color: #f4f4f9;
+}
+
+

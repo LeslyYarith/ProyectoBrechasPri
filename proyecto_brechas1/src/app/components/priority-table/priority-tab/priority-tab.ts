@@ -1,15 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';   // 👈 Necesario para directivas como *ngIf, *ngFor y pipes
 import { FormsModule } from '@angular/forms';     // 👈 Necesario para inputs, select y binding [(ngModel)]
 import { PrioritizationService, PriorityRegion } from '../../../services/prioritization-service';
 
-
-
 @Component({
   selector: 'app-priority-tab',
-  imports: [CommonModule,
-    FormsModule],
-    standalone: true,
+  imports: [CommonModule, FormsModule],
+  standalone: true,
   templateUrl: './priority-tab.html',
   styleUrl: './priority-tab.css'
 })
@@ -24,84 +21,111 @@ export class PriorityTabComponent {
   maxYear: number = 2025;                   // 👈 Año máximo seleccionado en el filtro
   isLoading: boolean = false;               // 👈 Bandera para mostrar un spinner mientras carga
   errorMessage: string = '';                // 👈 Mensaje de error si falla la carga de datos
+  isDarkMode: boolean = false;              // 👈 Bandera para saber si está en modo oscuro o claro
+  today: Date = new Date();                 // 👈 Fecha actual para "Última Actualización"
 
-  constructor(private prioritizationService: PrioritizationService) {}
+  constructor(
+    private prioritizationService: PrioritizationService,
+    private renderer: Renderer2
+  ) {}
 
   ngOnInit(): void {
-    this.loadAvailableIndicators();  // 👈 Al iniciar el componente, se cargan los indicadores
-  }
-// ================================
+    this.loadAvailableIndicators();  // 👈 Al iniciar el componente, se cargan los indicadores
+
+    // 👇 Detectar si el body tiene dark-mode al iniciar
+    this.isDarkMode = document.body.classList.contains('dark-mode');
+
+    // 👇 Observar cambios en el body para actualizar el flag
+    const observer = new MutationObserver(() => {
+      this.isDarkMode = document.body.classList.contains('dark-mode');
+    });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+    // 👇 Mantener actualizada la fecha cada minuto
+    setInterval(() => {
+      this.today = new Date();
+    }, 60000);
+  }
+
+  // ================================
   // CARGAR LISTA DE INDICADORES
   // ================================
   loadAvailableIndicators(): void {
     this.prioritizationService.getAvailableIndicators().subscribe({
       next: (indicators) => {
-        this.availableIndicators = indicators;   // 👈 Se guardan los indicadores recibidos
+        this.availableIndicators = indicators;
         if (indicators.length > 0) {
-          this.selectedIndicator = indicators[0]; // 👈 Se selecciona el primero por defecto
-          this.loadPriorityRegions();             // 👈 Se cargan las regiones según ese indicador
+          this.selectedIndicator = indicators[0];
+          this.loadPriorityRegions();
         }
       },
       error: (error) => {
-        console.error('Error loading indicators:', error); // 👈 Manejo de error
-      }
-    });
-  }
-// ================================
+        console.error('Error loading indicators:', error);
+      }
+    });
+  }
+
+  // ================================
   // CARGAR REGIONES PRIORIZADAS (TABLA)
   // ================================
   loadPriorityRegions(): void {
-    if (!this.selectedIndicator) return;  // 👈 Si no hay indicador seleccionado, no hace nada
+    if (!this.selectedIndicator) return;
 
-    this.isLoading = true;    // 👈 Se activa el spinner
-    this.errorMessage = '';   // 👈 Se limpia cualquier error previo
+    this.isLoading = true;
+    this.errorMessage = '';
 
     this.prioritizationService.getPriorityRegions(
-      this.selectedIndicator, // 👈 Indicador seleccionado en el filtro
-      this.minYear,           // 👈 Año mínimo
-      this.maxYear            // 👈 Año máximo
+      this.selectedIndicator,
+      this.minYear,
+      this.maxYear
     ).subscribe({
       next: (data) => {
-        this.priorityRegions = data;  // 👈 Se guardan los datos en la tabla
-        this.isLoading = false;       // 👈 Se apaga el spinner
+        this.priorityRegions = data;
+        this.isLoading = false;
       },
       error: (error) => {
-        this.errorMessage = 'Error al cargar los datos de priorización'; // 👈 Se muestra error en la UI
+        this.errorMessage = 'Error al cargar los datos de priorización';
         this.isLoading = false;
         console.error('Error:', error);
-      }
-    });
-  }
-// ================================
+      }
+    });
+  }
+
+  // ================================
   // EVENTO: CAMBIO DE INDICADOR
   // ================================
   onIndicatorChange(event: Event): void {
     const select = event.target as HTMLSelectElement;
-    this.selectedIndicator = select.value;   // 👈 Se actualiza el indicador seleccionado
-    this.loadPriorityRegions();              // 👈 Se recargan los datos de la tabla
-  }
-// ================================
+    this.selectedIndicator = select.value;
+    this.loadPriorityRegions();
+  }
+
+  // ================================
   // EVENTO: CAMBIO DE RANGO DE AÑOS
   // ================================
   onYearRangeChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.id === 'minYear') {
-      this.minYear = Number(input.value);  // 👈 Actualiza año mínimo
+      this.minYear = Number(input.value);
     } else if (input.id === 'maxYear') {
-      this.maxYear = Number(input.value);  // 👈 Actualiza año máximo
+      this.maxYear = Number(input.value);
     }
-    this.loadPriorityRegions();            // 👈 Se recargan los datos con el nuevo rango
+    this.loadPriorityRegions();
   }
 
   // ================================
   // CLASES CSS SEGÚN PRIORIDAD
   // ================================
   getPriorityClass(score: number): string {
-    if (score > 0.7) return 'high-priority';   // 👈 Alta prioridad
-    if (score > 0.4) return 'medium-priority'; // 👈 Media prioridad
-    return 'low-priority';                     // 👈 Baja prioridad
-  }
+    if (score > 0.7) return 'high-priority';
+    if (score > 0.4) return 'medium-priority';
+    return 'low-priority';
+  }
 
-
-
+  // ================================
+  // CLASES CSS DE TABLA SEGÚN TEMA
+  // ================================
+  getTableThemeClass(): string {
+    return this.isDarkMode ? 'table-dark' : 'table-light';
+  }
 }
