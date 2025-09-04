@@ -44,8 +44,12 @@
              (ngModelChange)="loadPriorityRegions()" min="2000" max="2025">
     </div>
 
-    <button (click)="loadPriorityRegions()" [disabled]="isLoading || !selectedIndicator">
-      {{ isLoading ? 'Cargando...' : 'Actualizar' }}
+    <!-- ⭐ CAMBIO: botón descarga SIEMPRE todas las filas -->
+    <button (click)="downloadCSV()"
+            [disabled]="isLoading || priorityRegions.length === 0 || isExporting"
+            title="Descargar TODOS los datos de la tabla como CSV">
+
+      {{ isExporting ? 'Descargando…' : 'Descargar CSV' }}
     </button>
   </div>
 
@@ -73,7 +77,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let region of priorityRegions; let i = index"
+        <!-- Se muestran 10 filas si está plegado; todas si está expandido -->
+        <tr *ngFor="let region of (isExpanded ? priorityRegions : (priorityRegions | slice:0:visibleCount)); let i = index"
             [class]="getPriorityClass(region.priorityScore)">
           <td>{{ i + 1 }}</td>
           <td>{{ region.countryName }} ({{ region.countryCode }})</td>
@@ -89,6 +94,17 @@
         </tr>
       </tbody>
     </table>
+
+    <!-- Botón ver más/menos -->
+    <div class="show-more-container" *ngIf="priorityRegions.length > visibleCount">
+      <button class="show-more-btn"
+              (click)="toggleExpand()"
+              [attr.aria-expanded]="isExpanded">
+        {{ isExpanded ? 'Ver menos' : 'Ver más (' + (priorityRegions.length - visibleCount) + ' más)' }}
+      </button>
+      <small class="hint" *ngIf="!isExpanded">Mostrando {{ visibleCount }} de {{ priorityRegions.length }} filas</small>
+      <small class="hint" *ngIf="isExpanded">Mostrando todas las {{ priorityRegions.length }} filas</small>
+    </div>
 
     <!-- Gráfico de ejemplo -->
     <div style="margin-top:30px;">

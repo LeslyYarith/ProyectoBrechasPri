@@ -2,7 +2,7 @@
    🎨 Variables de color
 =========================== */
 :root {
-  --background-color: #ffffff;
+  --background-color: #ddebf4;
   --text-color: #000000;
 
   /* Paleta de colores */
@@ -14,8 +14,7 @@
 }
 
 .dark-theme {
-  --background-color: #110844;
-  --background-color: #130f35;
+  --background-color: #0D1B2A;
   --text-color: #ffffff;
 
   --color1: #444444;
@@ -184,4 +183,36 @@ label {
 
 .action-buttons .add:hover {
   background-color: #4cd137;
+}
+
+/* Título en la barra de navegación */
+nav .app-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-left: 15px;
+  color: var(--text-color);
+}
+
+/* Botón Cambiar tema */
+nav button {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  background-color: #3f5e99;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+}
+
+nav button:hover {
+  background-color: #6b95e2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+nav button:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
