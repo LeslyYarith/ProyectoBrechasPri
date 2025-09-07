@@ -189,8 +189,57 @@ label {
 nav .app-title {
   font-size: 18px;
   font-weight: bold;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   margin-left: 15px;
   color: var(--text-color);
+}
+
+/* Switch base */
+.theme-switch {
+  position: relative;
+  display: inline-block;
+  width: 80px;
+  height: 32px;
+}
+
+.theme-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, #ff7e5f, #f7ba8b); /* Claro */
+  border-radius: 50px;
+  transition: background 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px;
+  font-size: 16px;
+}
+
+.slider .icon {
+  opacity: 0.9;
+  transition: opacity 0.3s;
+}
+
+input:checked + .slider {
+  background: linear-gradient(45deg, #283E51, #485563); /* Oscuro */
+}
+
+input:checked + .slider .sun {
+  opacity: 0.2;
+}
+
+input:checked + .slider .moon {
+  opacity: 1;
 }
 
 /* Botón Cambiar tema */
@@ -233,6 +282,22 @@ footer hr {
 .footer-text {
   font-size: 14px;
   opacity: 0.7;
+}
+
+/* Icono en la barra de navegación */
+.nav-icon {
+  margin-left: auto; /* Empuja el icono a la derecha */
+  width: 40px;
+  height: 40px;
+  border-radius: 50%; /* Circular */
+  object-fit: cover; /* Ajusta la imagen sin deformarla */
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.nav-icon:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
 }
 
 /* =========================================================
@@ -373,7 +438,7 @@ footer hr {
   }
 
   footer {
-    padding: 16px 8px;
+    padding: 0px;
     margin-top: 20px;
   }
 

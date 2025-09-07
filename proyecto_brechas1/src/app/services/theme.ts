@@ -7,6 +7,7 @@ import { isPlatformBrowser } from '@angular/common';
 export class ThemeService {
   private readonly darkModeKey = 'dark-mode';
   private isBrowser: boolean;
+  private darkTheme = false;
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -16,26 +17,14 @@ export class ThemeService {
       const savedTheme = localStorage.getItem(this.darkModeKey);
 
       if (savedTheme !== null) {
-        this.applyTheme(savedTheme === 'dark');
+        this.darkTheme = savedTheme === 'dark';
       } else {
-        // 👉 Si no hay preferencia, se asume claro por defecto
-        //    pero revisamos si el sistema tiene preferencia oscura
+        // 👉 Si no hay preferencia, usamos la del sistema
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        this.applyTheme(prefersDark);
+        this.darkTheme = prefersDark;
       }
-    }
-  }
 
-  /** Aplica un tema */
-  private applyTheme(isDark: boolean) {
-    if (!this.isBrowser) return;
-
-    if (isDark) {
-      document.body.classList.add('dark-theme');
-      localStorage.setItem(this.darkModeKey, 'dark');
-    } else {
-      document.body.classList.remove('dark-theme');
-      localStorage.setItem(this.darkModeKey, 'light');
+      this.applyTheme();
     }
   }
 
@@ -43,7 +32,24 @@ export class ThemeService {
   toggleTheme() {
     if (!this.isBrowser) return;
 
-    const isDark = document.body.classList.contains('dark-theme');
-    this.applyTheme(!isDark);
+    this.darkTheme = !this.darkTheme;
+    localStorage.setItem(this.darkModeKey, this.darkTheme ? 'dark' : 'light');
+    this.applyTheme();
+  }
+
+  /** Saber si el tema actual es oscuro */
+  isDarkTheme(): boolean {
+    return this.darkTheme;
+  }
+
+  /** Aplica el tema al <body> */
+  private applyTheme() {
+    if (!this.isBrowser) return;
+
+    if (this.darkTheme) {
+      document.body.classList.add('dark-theme');
+    } else {
+      document.body.classList.remove('dark-theme');
+    }
   }
 }

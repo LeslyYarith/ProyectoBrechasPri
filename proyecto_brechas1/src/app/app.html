@@ -1,14 +1,21 @@
 <nav>
-  <button (click)="toggleTheme()">
-    Cambiar tema
-  </button>
-  <span class="app-title">Análisis de Brechas y Priorización de Inversiones</span>
+  <label class="theme-switch" title="Cambiar tema">
+    <input type="checkbox" (change)="toggleTheme()" [checked]="themeService.isDarkTheme()">
+    <span class="slider">
+      <span class="icon sun">☀︎</span>
+      <span class="icon moon">☽︎</span>
+    </span>
+  </label>
+
+  <span class="app-title">●Análisis de Brechas y Priorización de Inversiones●</span>
+
+  <!-- 👇 Nuevo icono en la parte derecha -->
+  <img src="assets/imagenes/icono1.jpg" alt="icono" class="nav-icon" title="Icono del Proyecto">
 </nav>
 
 <hr>
 <router-outlet></router-outlet>
 
-<!-- 🔽 Nueva sección al final -->
 <footer>
   <hr>
   <p class="footer-text">© 2025 Proyecto Brechas - Análisis de Brechas y Priorización de Inversiones</p>
